@@ -51,7 +51,7 @@ public class BitbucketSCMProvider implements SCMProvider {
       BitbucketSCMProtocol.isProtocolSupported(this.bitbucketProtocol);
 
       EnvVarProperty envVarProperty = EnvVarProperty.getInstance();
-      String filePath =  envVarProperty.getProperty("WORKSPACE")+envVarProperty.getProperty("SCM_KEY")
+      String filePath =  envVarProperty.getProperty("WORKSPACE")+ "/" +envVarProperty.getProperty("SCM_KEY")
       Properties fileProperties = HelperUtils.getFileProperties(filePath)
       this.bitbucketUsername = fileProperties.getProperty("SCM_USERNAME");
       this.bitbucketPassword = fileProperties.getProperty("SCM_PASSWORD");
@@ -134,7 +134,7 @@ public class BitbucketSCMProvider implements SCMProvider {
   public void createScmRepos(String workspace, String repoNamespace, String codeReviewEnabled, String overwriteRepos) {
     String bitbucketUrl = this.bitbucketProtocol.toString() + "://" + this.bitbucketHost + ":" + this.bitbucketPort + this.bitbucketEndpoint;
 
-    BitbucketRequestUtil.isProjectAvailable(bitbucketUrl, this.bitbucketUsername, this.bitbucketPassword, repoNamespace);
+    BitbucketRequestUtil.isProjectAvailable(this.bitbucketHost, bitbucketUrl, this.bitbucketUsername, this.bitbucketPassword, repoNamespace);
 
     ExecuteShellCommand com = new ExecuteShellCommand()
 
@@ -152,7 +152,7 @@ public class BitbucketSCMProvider implements SCMProvider {
         String target_repo_name = repoNamespace + "/" + repoName
         int repo_exists=0;
 
-        List<String> bitbucketRepoList = BitbucketRequestUtil.getProjectRepositorys(bitbucketUrl, this.bitbucketUsername, this.bitbucketPassword, repoNamespace);
+        List<String> bitbucketRepoList = BitbucketRequestUtil.getProjectRepositorys(this.bitbucketHost, bitbucketUrl, this.bitbucketUsername, this.bitbucketPassword, repoNamespace);
         for(String bitbucketRepo: bitbucketRepoList) {
           if(bitbucketRepo.trim().contains(repoName)) {
              Logger.info("Found: " + target_repo_name);
@@ -162,7 +162,7 @@ public class BitbucketSCMProvider implements SCMProvider {
         }
         // If not, create it
         if (repo_exists == 0) {
-          BitbucketRequestUtil.createRepository(bitbucketUrl, this.bitbucketUsername, this.bitbucketPassword, repoNamespace, repoName);
+          BitbucketRequestUtil.createRepository(this.bitbucketHost, bitbucketUrl, this.bitbucketUsername, this.bitbucketPassword, repoNamespace, repoName);
         } else{
           Logger.info("Repository already exists, skipping create: : " + target_repo_name);
         }
