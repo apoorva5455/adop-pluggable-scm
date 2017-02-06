@@ -8,14 +8,13 @@ import pluggable.scm.helpers.*;
 
 public class BitbucketRequestUtil {
 
-  public static void isProjectAvailable(String bitbucketHost, String bitbucketUrl, String username, String password, String projectKey){
+  public static void isProjectAvailable(String bitbucketUrl, String username, String password, String projectKey){
     def http = new HTTPBuilder(bitbucketUrl);
     def auth = "${username}:${password}".bytes.encodeBase64().toString()
 
     http.request(GET){ req ->
         uri.path = "/rest/api/latest/projects/" + projectKey
         headers.'Authorization' = "Basic ${auth}"
-        headers.'Host' = "${bitbucketHost}"
         response.success = { resp ->
           assert resp.status == 200
           Logger.info("Project ${projectKey} found all good!")
@@ -32,7 +31,7 @@ public class BitbucketRequestUtil {
     };
   }
 
-  public static String[] getProjectRepositorys(String bitbucketHost, String bitbucketUrl, String username, String password, String projectKey){
+  public static String[] getProjectRepositorys(String bitbucketUrl, String username, String password, String projectKey){
       def http = new HTTPBuilder(bitbucketUrl);
       def auth = "${username}:${password}".bytes.encodeBase64().toString()
       List<String> repositoryList = [];
@@ -40,7 +39,6 @@ public class BitbucketRequestUtil {
         uri.path = "/rest/api/latest/projects/${projectKey}/repos"
         requestContentType = ContentType.JSON
         headers.'Authorization' = "Basic ${auth}"
-        headers.'Host' = "${bitbucketHost}"
         response.success = { resp, json ->
           assert resp.status == 200
           for(int i = 0; i < json.size; i++){
@@ -59,7 +57,7 @@ public class BitbucketRequestUtil {
       return repositoryList;
   }
 
-  public static void createRepository(String bitbucketHost, String bitbucketUrl, String username, String password, String projectKey, String repoName){
+  public static void createRepository(String bitbucketUrl, String username, String password, String projectKey, String repoName){
     def http = new HTTPBuilder(bitbucketUrl);
     def auth = "${username}:${password}".bytes.encodeBase64().toString()
 
@@ -68,7 +66,6 @@ public class BitbucketRequestUtil {
       requestContentType = ContentType.JSON
       body = [name: repoName, scmId: "git", forkable: "true"]
       headers.'Authorization' = "Basic ${auth}"
-      headers.'Host' = "${bitbucketHost}"
       response.success = { resp ->
         assert resp.status == 201
         Logger.info("Repository created in Bitbucket : " + projectKey + "/" + repoName);
