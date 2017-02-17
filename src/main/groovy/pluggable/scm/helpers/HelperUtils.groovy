@@ -1,6 +1,5 @@
 package pluggable.scm.helpers;
-@GrabResolver(name='jenkins-ci.plugins', root='http://repo.jenkins-ci.org/releases/')
-@Grab(group='org.jenkins-ci.plugins', module='credentials', version='2.1.5')
+
 import com.cloudbees.plugins.credentials.*;
 import com.cloudbees.plugins.credentials.common.*;
 import java.util.Properties;
